@@ -1,0 +1,94 @@
+# GraphQL Schema for Transportation Management System
+
+type Shipment {
+    id: ID!
+    trackingNumber: String!
+    customerName: String!
+    customerEmail: String
+    customerPhone: String
+    origin: String!
+    destination: String!
+    status: ShipmentStatus!
+    carrier: String
+    weight: Float
+    cost: Float
+    pickupDate: String
+    deliveryDate: String
+    notes: String
+    createdAt: String!
+    updatedAt: String
+    createdBy: String
+    updatedBy: String
+}
+
+enum ShipmentStatus {
+    PENDING
+    IN_TRANSIT
+    DELIVERED
+    CANCELLED
+}
+
+type ShipmentConnection {
+    content: [Shipment!]!
+    totalElements: Int!
+    totalPages: Int!
+    currentPage: Int!
+}
+
+input ShipmentInput {
+    trackingNumber: String!
+    customerName: String!
+    customerEmail: String
+    customerPhone: String
+    origin: String!
+    destination: String!
+    status: ShipmentStatus!
+    carrier: String
+    weight: Float
+    cost: Float
+    pickupDate: String
+    deliveryDate: String
+    notes: String
+}
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    firstName: String
+    lastName: String
+    role: String!
+}
+
+type AuthPayload {
+    token: String!
+    user: User!
+}
+
+type Query {
+    # Get paginated shipments with optional filters
+    shipments(
+        page: Int = 0
+        size: Int = 10
+        sortBy: String = "createdAt"
+        sortDir: String = "DESC"
+        status: ShipmentStatus
+        search: String
+    ): ShipmentConnection!
+
+    # Get single shipment by ID
+    shipment(id: ID!): Shipment
+
+    # Get shipment by tracking number
+    shipmentByTrackingNumber(trackingNumber: String!): Shipment
+}
+
+type Mutation {
+    # Authentication
+    login(username: String!, password: String!): AuthPayload!
+
+    # Shipment mutations
+    createShipment(input: ShipmentInput!): Shipment!
+    updateShipment(id: ID!, input: ShipmentInput!): Shipment!
+    deleteShipment(id: ID!): Boolean!
+}
