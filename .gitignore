@@ -9,6 +9,6 @@ frontend/dist/
 frontend/.vite/
 
 # Common
-.env
-.env.*
+# .env
+# .env.*
 .DS_Store
