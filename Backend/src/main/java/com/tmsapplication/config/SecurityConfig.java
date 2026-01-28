@@ -1,5 +1,5 @@
+// java
 package com.tmsapplication.config;
-
 
 import com.tmsapplication.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
-    @Value("${cors.allowed.origins}")
+    @Value("${cors.allowed.origins:}")
     private String[] allowedOrigins;
 
     @Bean
@@ -68,12 +68,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type"
-        ));
+
+        // Use allowed origin patterns so you can use wildcards if needed.
+        if (allowedOrigins != null && allowedOrigins.length > 0) {
+            configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins));
+        } else {
+            // In absence of configured origins, allow the frontend origin(s) during testing.
+            // Prefer explicit origin values in production (e.g. "https://tms-fullstack-five.vercel.app")
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        }
+
+        // Allow all common HTTP methods (or list them explicitly)
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        // Allow headers required by your client
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
